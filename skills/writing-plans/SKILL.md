@@ -16,6 +16,8 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
 **Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
+**After plans are saved** Save a test verification file at `docs/plans/YYYY-MM-DD-<feature-name>-test-verification.md`. It should be a checklist file, with a simple empty checkbox for each planned phase.
+**Critical** The last planned task in each phase MUST be the complete testing of user-facing outcomes using the determined Verification Method, and the update of the phase in the docs/plans/YYYY-MM-DD-<feature-name>-test-verification.md to complete.
 
 ## Bite-Sized Task Granularity
 
