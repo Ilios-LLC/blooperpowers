@@ -26,6 +26,31 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 - "Run the tests and make sure they pass" - step
 - "Commit" - step
 
+## User-Testable Phase Structure (Web Apps)
+
+**Every phase must leave the app in a user-testable state.**
+
+**The constraint:** No "backend now, frontend later" phases. Each phase must include UI work that makes it verifiable through the browser.
+
+**Instead of:**
+```
+Phase 1: Set up database schema for recipes
+Phase 2: Add API endpoints for recipes
+Phase 3: Build recipe list UI
+```
+
+**Structure as:**
+```
+Phase 1: User can see an empty recipe list
+  (schema + API + basic list UI)
+Phase 2: User can add a recipe via form
+  (create endpoint + form UI)
+Phase 3: User can delete a recipe
+  (delete endpoint + delete button + confirmation)
+```
+
+**Infrastructure bundling rule:** Infrastructure work cannot be its own phase. Bundle it with the first feature that makes it user-visible.
+
 ## Plan Document Header
 
 **Every plan MUST start with this header:**
@@ -41,13 +66,21 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Tech Stack:** [Key technologies/libraries]
 
+**User Entrypoint:** [From design doc - e.g., "Web application"]
+
+**Verification Method:** [e.g., "Playwright browser testing - each phase verified through UI"]
+
+**User-Facing Capabilities:** [List from design doc]
+
 ---
 ```
 
 ## Task Structure
 
 ```markdown
-### Task N: [Component Name]
+### Task N: [User-Facing Outcome]
+
+**What the user can do after this task:** [e.g., "User can see an empty recipe list"]
 
 **Files:**
 - Create: `exact/path/to/file.py`
@@ -79,7 +112,15 @@ def function(input):
 Run: `pytest tests/path/test.py::test_name -v`
 Expected: PASS
 
-**Step 5: Commit**
+**Step 5: Playwright verification (REQUIRED for web apps)**
+
+Run Playwright to verify user-facing outcome:
+- Navigate to: [URL]
+- Action: [What to do]
+- Expected: [What user should see]
+- Pass criteria: [Specific visible elements, no console errors]
+
+**Step 6: Commit**
 
 ```bash
 git add tests/path/test.py src/path/file.py

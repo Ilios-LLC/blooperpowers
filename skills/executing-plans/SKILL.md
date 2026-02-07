@@ -49,15 +49,70 @@ After all tasks complete and verified:
 - **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
 
-## When to Stop and Ask for Help
+## Binary Outcomes (REQUIRED)
 
-**STOP executing immediately when:**
-- Hit a blocker mid-batch (missing dependency, test fails, instruction unclear)
-- Plan has critical gaps preventing starting
-- You don't understand an instruction
-- Verification fails repeatedly
+**Every task ends in one of two states:**
 
-**Ask for clarification rather than guessing.**
+**PASS:** Playwright verification succeeds → commit, move to next task
+
+**ASK:** Playwright verification fails → stop and request help using required template
+
+**No other outcomes are valid:**
+- ❌ No "blocked" — either fix it or ASK
+- ❌ No "skipped" — every task must be verified
+- ❌ No "partial success" — it works or it doesn't
+- ❌ No "tests failed but continuing" — stop and ASK
+- ❌ No workarounds — no curl, no API tests, no unit-test-only verification
+
+## Playwright-Only Verification (Web Apps)
+
+**For web applications, all task verification must use Playwright browser testing.**
+
+**Allowed:**
+- ✅ Playwright navigation and assertions
+- ✅ Playwright screenshots for evidence
+- ✅ Playwright console log capture
+
+**Not allowed as final verification:**
+- ❌ curl or wget
+- ❌ Direct API calls
+- ❌ Unit tests alone (unit tests are in addition to, not instead of)
+- ❌ "I checked the code and it looks correct"
+- ❌ Postman or similar tools
+
+**The test must match how users actually interact.** If users use a browser, verify with a browser.
+
+## Required ASK Template
+
+**When Playwright verification fails, use this exact format:**
+
+```markdown
+## Task Failed: [Task Name]
+
+**What I was trying to verify:**
+[The user-facing outcome, e.g., "User can see empty recipe list"]
+
+**What happened:**
+[Specific failure, e.g., "Page shows 500 error instead of recipe list"]
+
+**Evidence:**
+- Playwright output: [paste]
+- Screenshot: [if available]
+- Console errors: [if any]
+
+**What I tried:**
+1. [First attempt and result]
+2. [Second attempt and result]
+
+**What I need from you:**
+[Specific ask, e.g., "Is the database running? I see a connection refused error."]
+```
+
+**You must provide:**
+- Specific failure description (not "it didn't work")
+- Evidence from Playwright (output, screenshots, console)
+- What you already tried
+- A specific, actionable ask
 
 ## When to Revisit Earlier Steps
 
@@ -70,10 +125,12 @@ After all tasks complete and verified:
 ## Remember
 - Review plan critically first
 - Follow plan steps exactly
-- Don't skip verifications
+- **Playwright verification is mandatory for web apps** — no exceptions
+- **Binary outcomes only** — PASS or ASK, nothing else
+- **Use the ASK template** — specific, structured, with evidence
 - Reference skills when plan says to
 - Between batches: just report and wait
-- Stop when blocked, don't guess
+- **Never skip, block, or work around failed verification**
 - Never start implementation on main/master branch without explicit user consent
 
 ## Integration
