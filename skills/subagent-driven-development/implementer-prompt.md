@@ -72,7 +72,15 @@ Task tool (general-purpose):
     When done, report:
     - What you implemented
     - What you tested and test results
+    - **Verification evidence (REQUIRED):**
+      - For unit tests: Show test command output (X/X passing)
+      - For UI changes: Show Playwright output or browser state
+      - "I verified it" is NOT evidence - show output
     - Files changed
     - Self-review findings (if any)
     - Any issues or concerns
+
+    **CRITICAL:** Claims without evidence will be rejected.
+    "Tests pass" requires showing "X/X tests passing".
+    "Playwright verified" requires showing page state or test output.
 ```

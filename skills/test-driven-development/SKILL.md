@@ -268,6 +268,10 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 | "TDD will slow me down" | TDD faster than debugging. Pragmatic = test-first. |
 | "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
 | "Existing code has no tests" | You're improving it. Add tests for existing code. |
+| "Subagent verified it" | Verify independently with evidence |
+| "I ran Playwright" | Show the output or it didn't happen |
+| "Plan says E2E but unit tests enough" | Plan steps are mandatory, not suggestions |
+| "Implementer claims verified" | Claims ≠ evidence. Run it yourself. |
 
 ## Red Flags - STOP and Start Over
 
@@ -284,6 +288,11 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 - "Already spent X hours, deleting is wasteful"
 - "TDD is dogmatic, I'm being pragmatic"
 - "This is different because..."
+- "I verified with Playwright" (without showing output)
+- "Subagent said tests pass" (trusted without evidence)
+- UI changes without E2E verification
+- Claiming verification without showing proof
+- Plan has Playwright steps but only ran unit tests
 
 **All of these mean: Delete code. Start over with TDD.**
 
@@ -336,8 +345,38 @@ Before marking work complete:
 - [ ] Output pristine (no errors, warnings)
 - [ ] Tests use real code (mocks only if unavoidable)
 - [ ] Edge cases and errors covered
+- [ ] E2E verification run for UI changes (with evidence shown)
+- [ ] Verification output displayed (not just claimed)
+- [ ] Plan's Playwright/E2E steps executed (if plan specifies them)
 
 Can't check all boxes? You skipped TDD. Start over.
+
+## E2E Verification (UI Features)
+
+For any user-facing changes, unit tests are insufficient.
+
+**The Rule:**
+```
+UI CHANGES REQUIRE E2E VERIFICATION WITH EVIDENCE
+```
+
+Unit tests verify code correctness. E2E tests verify features work for users.
+
+**Requirements:**
+- Run Playwright/browser test after implementing UI features
+- Show actual output (not "I verified it")
+- Evidence = screenshot, test output, or visible confirmation
+- "Trusted subagent claim" ≠ verification
+
+**Evidence Examples:**
+```
+✅ [Run playwright test] [See: page shows form with 3 fields] "E2E verified"
+✅ [Navigate to /create] [Screenshot shows wizard step 1] "UI verified"
+❌ "I verified with Playwright" (no output shown)
+❌ "Subagent said it works"
+```
+
+When plan includes Playwright verification steps, they are MANDATORY - not suggestions.
 
 ## When Stuck
 
@@ -369,3 +408,14 @@ Otherwise → not TDD
 ```
 
 No exceptions without your human partner's permission.
+
+## Integration
+
+**With verification-before-completion:**
+When completing tasks, use @verification-before-completion to ensure evidence before claims.
+
+**E2E is mandatory for UI:**
+Unit tests prove code works. E2E proves feature works. Both required for UI changes.
+
+**With subagent-driven-development:**
+When dispatching subagents, require verification evidence in their reports - not just claims.

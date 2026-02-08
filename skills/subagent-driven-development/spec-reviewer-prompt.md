@@ -55,6 +55,13 @@ Task tool (general-purpose):
 
     **Verify by reading code, not by trusting report.**
 
+    **Verification evidence:**
+    - Did they show test output (not just claim "tests pass")?
+    - For UI changes: Did they show Playwright/browser evidence?
+    - Is there actual proof of verification, or just claims?
+
+    If implementer claimed verification without evidence, that's a ❌.
+
     Report:
     - ✅ Spec compliant (if everything matches after code inspection)
     - ❌ Issues found: [list specifically what's missing or extra, with file:line references]

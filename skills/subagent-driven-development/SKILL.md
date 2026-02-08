@@ -53,6 +53,8 @@ digraph process {
         "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [shape=box];
         "Code quality reviewer subagent approves?" [shape=diamond];
         "Implementer subagent fixes quality issues" [shape=box];
+        "Controller runs E2E verification (for UI tasks)" [shape=box];
+        "E2E passes with evidence?" [shape=diamond];
         "Mark task complete in TodoWrite" [shape=box];
     }
 
@@ -74,7 +76,10 @@ digraph process {
     "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" -> "Code quality reviewer subagent approves?";
     "Code quality reviewer subagent approves?" -> "Implementer subagent fixes quality issues" [label="no"];
     "Implementer subagent fixes quality issues" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="re-review"];
-    "Code quality reviewer subagent approves?" -> "Mark task complete in TodoWrite" [label="yes"];
+    "Code quality reviewer subagent approves?" -> "Controller runs E2E verification (for UI tasks)" [label="yes"];
+    "Controller runs E2E verification (for UI tasks)" -> "E2E passes with evidence?";
+    "E2E passes with evidence?" -> "Mark task complete in TodoWrite" [label="yes"];
+    "E2E passes with evidence?" -> "Implementer subagent fixes quality issues" [label="no"];
     "Mark task complete in TodoWrite" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
@@ -211,6 +216,10 @@ Done!
 - Let implementer self-review replace actual review (both are needed)
 - **Start code quality review before spec compliance is ✅** (wrong order)
 - Move to next task while either review has open issues
+- Trust implementer's verification claims without seeing output
+- Skip E2E verification for UI changes
+- Accept "I ran Playwright" without shown evidence
+- Move to next task without E2E verification (for UI work)
 
 **If subagent asks questions:**
 - Answer clearly and completely
@@ -234,6 +243,7 @@ Done!
 - **superpowers:writing-plans** - Creates the plan this skill executes
 - **superpowers:requesting-code-review** - Code review template for reviewer subagents
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks
+- **superpowers:verification-before-completion** - REQUIRED: Evidence before completion claims
 
 **Subagents should use:**
 - **superpowers:test-driven-development** - Subagents follow TDD for each task
