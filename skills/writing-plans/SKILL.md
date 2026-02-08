@@ -130,6 +130,18 @@ git commit -m "feat: add specific feature"
 ```
 ```
 
+## Verification Red Flags
+
+When executing verification tasks, watch for these shortcuts that lead to incomplete testing:
+
+| Thought Pattern | Reality |
+|-----------------|---------|
+| "The happy path works, that's enough" | If you're only verifying things work, not that they correctly reject invalid input, you're skipping half the tests. |
+| "The result was unclear but let's move on" | An unclear or ambiguous result is not a passing result. Investigate or flag it. |
+| "I wrote the CSS, it probably works" | If it can't be seen, it wasn't tested. Visual/CSS changes need visual verification. |
+| "I tested pan, zoom probably works too" | Testing one variant doesn't verify others. Each behavior needs its own verification. |
+| "I remember the checklist items" | Copy the verification checklist into your response and physically check off each item as you test it. Working from memory leads to skipped items. |
+
 ## Remember
 - Exact file paths always
 - Complete code in plan (not "add validation")
