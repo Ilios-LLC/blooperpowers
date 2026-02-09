@@ -19,7 +19,9 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Verification tracking:** Execution skills (executing-plans, subagent-driven-development) will create and maintain `docs/plans/YYYY-MM-DD-<feature-name>-test-verification.md` at phase completion. This skill does not create that file.
 
-**Critical:** The last planned task in each phase MUST be complete testing of user-facing outcomes using the designated UEP Verification Method.
+**Critical:** The last planned task in each phase MUST be complete testing of user-facing outcomes using the designated UEP Verification Method. Mark these tasks with `[CHECKPOINT]` in the title.
+
+**Checkpoint markers:** Tasks with `[CHECKPOINT]` in the title signal phase boundaries. Execution skills pause after these tasks for user review. The `[CHECKPOINT]` task must include UEP verification and update the test-verification file.
 
 ## Bite-Sized Task Granularity
 
