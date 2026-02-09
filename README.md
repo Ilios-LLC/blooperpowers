@@ -1,148 +1,103 @@
-# Superpowers
+# Blooperpowers
 
-Superpowers is a complete software development workflow for your coding agents, built on top of a set of composable "skills" and some initial instructions that make sure your agent uses them.
+A fork of [superpowers](https://github.com/obra/superpowers) with flexible User Entrypoint support and phase-based verification tracking.
 
-## How it works
+> For the original superpowers documentation, see [obra/superpowers](https://github.com/obra/superpowers).
 
-It starts from the moment you fire up your coding agent. As soon as it sees that you're building something, it *doesn't* just jump into trying to write code. Instead, it steps back and asks you what you're really trying to do. 
+## What Makes This Fork Different
 
-Once it's teased a spec out of the conversation, it shows it to you in chunks short enough to actually read and digest. 
+### 1. Focuses in repeated testing from a User Entrypoint Perspective (UEP)
 
-After you've signed off on the design, your agent puts together an implementation plan that's clear enough for an enthusiastic junior engineer with poor taste, no judgement, no project context, and an aversion to testing to follow. It emphasizes true red/green TDD, YAGNI (You Aren't Gonna Need It), and DRY. 
+Supports 6 User Entrypoint (UEP) types:
+- **Web Application** - Playwright browser testing
+- **CLI Tool** - Command execution + output verification
+- **API Service** - Endpoint testing via curl/test client
+- **Cloud Dashboard** - Terraform Cloud, Vercel, AWS console verification
+- **Library/SDK** - Unit tests + example consumer code
+- **Other** - Custom verification approach
 
-Next up, once you say "go", it launches a *subagent-driven-development* process, having agents work through each engineering task, inspecting and reviewing their work, and continuing forward. It's not uncommon for Claude to be able to work autonomously for a couple hours at a time without deviating from the plan you put together.
+### 2. UEP Discovery & Persistence
 
-There's a bunch more to it, but that's the core of the system. And because the skills trigger automatically, you don't need to do anything special. Your coding agent just has Superpowers.
+The brainstorming skill:
+1. Checks your project's `CLAUDE.md` for an existing UEP definition
+2. Infers type from codebase if missing (package.json → Web, main.go → CLI, .tf files → Cloud)
+3. Offers to persist the UEP so future sessions remember it
 
+Store in your CLAUDE.md:
+```markdown
+## User Entrypoint
+Type: CLI Tool
+Verification: Command execution with output checking
+```
 
-## Sponsorship
+### 3. Phase-Based Verification Tracking
 
-If Superpowers has helped you do stuff that makes money and you are so inclined, I'd greatly appreciate it if you'd consider [sponsoring my opensource work](https://github.com/sponsors/obra).
+Execution skills create `docs/plans/YYYY-MM-DD-<feature>-test-verification.md` at phase completion:
 
-Thanks! 
+```markdown
+## Phase 1: User can run `mytool --help`
+**Verification performed:** 2026-02-09
+**What was tested:**
+- Ran `mytool --help`
+- Confirmed output shows available commands
+- Verified exit code 0
+**Result:** PASS
+```
 
-- Jesse
+This creates an audit trail of what was actually tested, not just what was planned.
 
+### 4. Type-Specific Verification Rules
+
+Each UEP type has explicit allowed/forbidden methods:
+
+| UEP Type | Allowed | Not Allowed |
+|----------|---------|-------------|
+| Web Application | Playwright assertions, screenshots | curl, direct API calls |
+| CLI Tool | Command output, exit codes | Unit tests alone |
+| API Service | curl/httpie with response capture | "I checked the code" |
+| Cloud Dashboard | Console state, `terraform show` | "I applied it" without checking |
+| Library/SDK | Test output, example script runs | "Tests pass" without output |
 
 ## Installation
 
-**Note:** Installation differs by platform. Claude Code has a built-in plugin system. Codex and OpenCode require manual setup.
-
 ### Claude Code (via Plugin Marketplace)
 
-In Claude Code, register the marketplace first:
+Register the marketplace and install:
 
 ```bash
 /plugin marketplace add obra/superpowers-marketplace
+/plugin install blooperpowers@superpowers-marketplace
 ```
 
-Then install the plugin from this marketplace:
+### Manual Installation
 
-```bash
-/plugin install superpowers@superpowers-marketplace
-```
+Clone this repo and point your agent to it, or copy the skills directory to your project.
 
-### Verify Installation
+## The Workflow
 
-Start a new session and ask Claude to help with something that would trigger a skill (e.g., "help me plan this feature" or "let's debug this issue"). Claude should automatically invoke the relevant superpowers skill.
+Same as superpowers, with UEP-aware verification:
 
-### Codex
-
-Tell Codex:
-
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.codex/INSTALL.md
-```
-
-**Detailed docs:** [docs/README.codex.md](docs/README.codex.md)
-
-### OpenCode
-
-Tell OpenCode:
-
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.opencode/INSTALL.md
-```
-
-**Detailed docs:** [docs/README.opencode.md](docs/README.opencode.md)
-
-## The Basic Workflow
-
-1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
-
-2. **using-git-worktrees** - Activates after design approval. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
-
-3. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
-
-4. **subagent-driven-development** or **executing-plans** - Activates with plan. Dispatches fresh subagent per task with two-stage review (spec compliance, then code quality), or executes in batches with human checkpoints.
-
-5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
-
-6. **requesting-code-review** - Activates between tasks. Reviews against plan, reports issues by severity. Critical issues block progress.
-
-7. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree.
-
-**The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
-
-## What's Inside
-
-### Skills Library
-
-**Testing**
-- **test-driven-development** - RED-GREEN-REFACTOR cycle (includes testing anti-patterns reference)
-
-**Debugging**
-- **systematic-debugging** - 4-phase root cause process (includes root-cause-tracing, defense-in-depth, condition-based-waiting techniques)
-- **verification-before-completion** - Ensure it's actually fixed
-
-**Collaboration** 
-- **brainstorming** - Socratic design refinement
-- **writing-plans** - Detailed implementation plans
-- **executing-plans** - Batch execution with checkpoints
-- **dispatching-parallel-agents** - Concurrent subagent workflows
-- **requesting-code-review** - Pre-review checklist
-- **receiving-code-review** - Responding to feedback
-- **using-git-worktrees** - Parallel development branches
-- **finishing-a-development-branch** - Merge/PR decision workflow
-- **subagent-driven-development** - Fast iteration with two-stage review (spec compliance, then code quality)
-
-**Meta**
-- **writing-skills** - Create new skills following best practices (includes testing methodology)
-- **using-superpowers** - Introduction to the skills system
+1. **brainstorming** - Discovers your UEP, refines design, offers to persist UEP to CLAUDE.md
+2. **writing-plans** - Creates UEP-appropriate phase structure with type-specific verification steps
+3. **executing-plans** / **subagent-driven-development** - Executes tasks, creates verification file at each phase completion
+4. **finishing-a-development-branch** - Merge, PR, keep, or discard
 
 ## Philosophy
 
-- **Test-Driven Development** - Write tests first, always
-- **Systematic over ad-hoc** - Process over guessing
-- **Complexity reduction** - Simplicity as primary goal
-- **Evidence over claims** - Verify before declaring success
+Same as superpowers:
+- Test-Driven Development
+- Systematic over ad-hoc
+- Complexity reduction
+- Evidence over claims
 
-Read more: [Superpowers for Claude Code](https://blog.fsck.com/2025/10/09/superpowers/)
-
-## Contributing
-
-Skills live directly in this repository. To contribute:
-
-1. Fork the repository
-2. Create a branch for your skill
-3. Follow the `writing-skills` skill for creating and testing new skills
-4. Submit a PR
-
-See `skills/writing-skills/SKILL.md` for the complete guide.
-
-## Updating
-
-Skills update automatically when you update the plugin:
-
-```bash
-/plugin update superpowers
-```
+Plus:
+- **UEP flexibility** - Your project type shouldn't limit your workflow
+- **Verification audit trail** - Know what was actually tested, not just planned
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - see LICENSE file
 
-## Support
+## Credits
 
-- **Issues**: https://github.com/obra/superpowers/issues
-- **Marketplace**: https://github.com/obra/superpowers-marketplace
+Forked from [obra/superpowers](https://github.com/obra/superpowers) by Jesse Vincent.
