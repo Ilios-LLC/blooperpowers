@@ -57,7 +57,12 @@ Task tool (general-purpose):
 
     **Verification evidence:**
     - Did they show test output (not just claim "tests pass")?
-    - For UI changes: Did they show Playwright/browser evidence?
+    - Did they show UEP verification evidence appropriate to project type?
+      - Web: Playwright/browser evidence
+      - CLI: Command output
+      - API: Request/response
+      - Cloud: State verification
+      - Library: Test/example output
     - Is there actual proof of verification, or just claims?
 
     If implementer claimed verification without evidence, that's a ❌.

@@ -15,9 +15,11 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
-**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`
-**After plans are saved** Save a test verification file at `docs/plans/YYYY-MM-DD-<feature-name>-test-verification.md`. It should be a checklist file, with a simple empty checkbox for each planned phase.
-**Critical** The last planned task in each phase MUST be the complete testing of user-facing outcomes using the determined Verification Method, and the update of the phase in the docs/plans/YYYY-MM-DD-<feature-name>-test-verification.md to complete.
+**Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>-implementation.md`
+
+**Verification tracking:** Execution skills (executing-plans, subagent-driven-development) will create and maintain `docs/plans/YYYY-MM-DD-<feature-name>-test-verification.md` at phase completion. This skill does not create that file.
+
+**Critical:** The last planned task in each phase MUST be complete testing of user-facing outcomes using the designated UEP Verification Method.
 
 ## Bite-Sized Task Granularity
 
@@ -28,30 +30,37 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 - "Run the tests and make sure they pass" - step
 - "Commit" - step
 
-## User-Testable Phase Structure (Web Apps)
+## User-Testable Phase Structure
 
-**Every phase must leave the app in a user-testable state.**
+**Every phase must leave the project in a user-testable state via the designated UEP.**
 
-**The constraint:** No "backend now, frontend later" phases. Each phase must include UI work that makes it verifiable through the browser.
+**The constraint:** No "infrastructure now, user-facing later" phases. Each phase must include work that makes it verifiable through the User Entrypoint.
 
-**Instead of:**
-```
-Phase 1: Set up database schema for recipes
-Phase 2: Add API endpoints for recipes
-Phase 3: Build recipe list UI
-```
-
-**Structure as:**
+**Web Application example:**
 ```
 Phase 1: User can see an empty recipe list
   (schema + API + basic list UI)
 Phase 2: User can add a recipe via form
   (create endpoint + form UI)
-Phase 3: User can delete a recipe
-  (delete endpoint + delete button + confirmation)
 ```
 
-**Infrastructure bundling rule:** Infrastructure work cannot be its own phase. Bundle it with the first feature that makes it user-visible.
+**CLI Tool example:**
+```
+Phase 1: User can run `mytool --help` and see available commands
+  (argument parser + help text)
+Phase 2: User can run `mytool init` and see project scaffold created
+  (init command + file generation)
+```
+
+**Cloud Dashboard example:**
+```
+Phase 1: User can see new resource in Terraform Cloud plan output
+  (terraform config + plan verification)
+Phase 2: User can see resource deployed after apply
+  (apply + dashboard verification)
+```
+
+**Infrastructure bundling rule:** Infrastructure work cannot be its own phase. Bundle it with the first feature that makes it user-visible via the UEP.
 
 ## Plan Document Header
 
@@ -68,9 +77,9 @@ Phase 3: User can delete a recipe
 
 **Tech Stack:** [Key technologies/libraries]
 
-**User Entrypoint:** [From design doc - e.g., "Web application"]
+**User Entrypoint:** [From design doc - e.g., "Web Application", "CLI Tool", "Cloud Dashboard"]
 
-**Verification Method:** [e.g., "Playwright browser testing - each phase verified through UI"]
+**Verification Method:** [From design doc - e.g., "Playwright browser testing", "Command execution + output checking", "Terraform Cloud workspace verification"]
 
 **User-Facing Capabilities:** [List from design doc]
 
@@ -114,13 +123,30 @@ def function(input):
 Run: `pytest tests/path/test.py::test_name -v`
 Expected: PASS
 
-**Step 5: Playwright verification (REQUIRED for web apps)**
+**Step 5: UEP verification (REQUIRED)**
 
-Run Playwright to verify user-facing outcome:
+Verify user-facing outcome via the project's User Entrypoint:
+
+*For Web Application:*
 - Navigate to: [URL]
 - Action: [What to do]
 - Expected: [What user should see]
-- Pass criteria: [Specific visible elements, no console errors]
+
+*For CLI Tool:*
+- Run: `[command with args]`
+- Expected output: [What user should see]
+
+*For API Service:*
+- Request: `curl -X [METHOD] [URL] -d '[data]'`
+- Expected response: [Status code and body]
+
+*For Cloud Dashboard:*
+- Check: [Dashboard/console location]
+- Expected state: [What should be visible]
+
+*For Library/SDK:*
+- Run: `[test command or example script]`
+- Expected: [Output or behavior]
 
 **Step 6: Commit**
 

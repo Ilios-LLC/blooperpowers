@@ -20,25 +20,52 @@ Start by understanding the current project context, then ask questions one at a 
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
 - Focus on understanding: purpose, constraints, success criteria
 
-**Identifying user entrypoint (REQUIRED for web apps):**
-- Analyze project structure to infer entrypoint type:
-  - Has `index.html`, React/Vue/Svelte, or web framework? → Web app
-  - Has both frontend and backend directories? → Full-stack web app
-  - No frontend detected? → Warn and use best-effort verification
-- Confirm with user:
-  > "This appears to be a **web application**. All implementation phases will be verified via Playwright browser testing — each phase must leave the app in a working state that can be tested through the UI. Is that correct?"
-- Store entrypoint type in design document for use by writing-plans
+**Identifying user entrypoint (REQUIRED for all projects):**
+
+1. **Check CLAUDE.md first** - Look for existing `## User Entrypoint` block:
+   ```markdown
+   ## User Entrypoint
+   Type: Web Application
+   Verification: Playwright browser testing at http://localhost:3000
+   ```
+
+2. **If found** - Confirm with user:
+   > "I see your UEP is **[Type]** with verification via [Verification]. Is that correct?"
+
+3. **If not found** - Explore codebase to infer type:
+   - Has `package.json` with React/Vue/Svelte/Next → Web Application
+   - Has `main.go` or `cmd/` directory → CLI Tool
+   - Has `terraform/` or `.tf` files → Cloud Dashboard (Terraform)
+   - Has `openapi.yaml` or API routes only → API Service
+   - Has `setup.py`/`pyproject.toml` with library structure → Library/SDK
+   - None of the above → Ask user
+
+4. **Present inference**:
+   > "This looks like a **[Type]** based on [evidence]. Is that correct?"
+
+5. **If user says no**, offer options:
+   - Web Application (Playwright browser testing)
+   - CLI Tool (command execution + output verification)
+   - API Service (endpoint testing via curl/test client)
+   - Cloud Dashboard (Terraform Cloud, Vercel, AWS, etc.)
+   - Library/SDK (unit tests + example consumer code)
+   - Other (describe your verification approach)
+
+6. **Offer to persist**:
+   > "Would you like me to add this to your CLAUDE.md so future sessions remember it?"
+
+- Store UEP type and Verification Method in design document for use by writing-plans
 
 **Discovering user interactions (REQUIRED):**
 - For every feature request, ask: "How will users interact with [feature]?"
-  - Options: UI (forms, buttons, pages), API-only, CLI, etc.
-- If user mentions functionality without specifying UI, pitch missing components:
+  - Options vary by UEP type (UI forms/buttons, CLI commands, API endpoints, dashboard checks, etc.)
+- If user mentions functionality without specifying interaction, pitch missing components:
   > "For users to actually use [feature], you'd likely need:
-  > - [List specific UI components: forms, lists, buttons, etc.]
+  > - [List specific interaction points based on UEP type]
   >
   > Should I include these in the design?"
 - Before proceeding to design, confirm complete user-facing scope:
-  > "So when this is done, a user will be able to: [list capabilities]. All phases will be verified by testing these through the browser. Correct?"
+  > "So when this is done, a user will be able to: [list capabilities]. All phases will be verified using [Verification Method]. Correct?"
 
 **Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs
@@ -57,7 +84,8 @@ Start by understanding the current project context, then ask questions one at a 
 **Documentation:**
 - Write the validated design to `docs/plans/YYYY-MM-DD-<topic>-design.md`
 - Design document MUST include:
-  - **Entrypoint type:** (e.g., "Web application - Playwright verification")
+  - **User Entrypoint type:** (e.g., "CLI Tool", "Web Application", "Cloud Dashboard")
+  - **Verification Method:** How phases will be verified (e.g., "Command execution + output checking")
   - **User-facing capabilities:** List of what users can do when complete
   - **Phase verification approach:** How each phase will be tested from user perspective
 - Use elements-of-style:writing-clearly-and-concisely skill if available

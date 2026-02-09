@@ -74,13 +74,18 @@ Task tool (general-purpose):
     - What you tested and test results
     - **Verification evidence (REQUIRED):**
       - For unit tests: Show test command output (X/X passing)
-      - For UI changes: Show Playwright output or browser state
-      - "I verified it" is NOT evidence - show output
+      - For UEP verification: Show output appropriate to project's User Entrypoint:
+        - Web Application: Playwright output or browser state
+        - CLI Tool: Command output with exit code
+        - API Service: Request/response with status code
+        - Cloud Dashboard: State verification output
+        - Library/SDK: Test output or example script execution
+      - "I verified it" is NOT evidence - show actual output
     - Files changed
     - Self-review findings (if any)
     - Any issues or concerns
 
     **CRITICAL:** Claims without evidence will be rejected.
     "Tests pass" requires showing "X/X tests passing".
-    "Playwright verified" requires showing page state or test output.
+    "UEP verified" requires showing actual verification output.
 ```

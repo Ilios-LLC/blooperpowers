@@ -53,8 +53,8 @@ digraph process {
         "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [shape=box];
         "Code quality reviewer subagent approves?" [shape=diamond];
         "Implementer subagent fixes quality issues" [shape=box];
-        "Controller runs E2E verification (for UI tasks)" [shape=box];
-        "E2E passes with evidence?" [shape=diamond];
+        "Controller runs UEP verification" [shape=box];
+        "UEP verification passes with evidence?" [shape=diamond];
         "Mark task complete in TodoWrite" [shape=box];
     }
 
@@ -76,10 +76,10 @@ digraph process {
     "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" -> "Code quality reviewer subagent approves?";
     "Code quality reviewer subagent approves?" -> "Implementer subagent fixes quality issues" [label="no"];
     "Implementer subagent fixes quality issues" -> "Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)" [label="re-review"];
-    "Code quality reviewer subagent approves?" -> "Controller runs E2E verification (for UI tasks)" [label="yes"];
-    "Controller runs E2E verification (for UI tasks)" -> "E2E passes with evidence?";
-    "E2E passes with evidence?" -> "Mark task complete in TodoWrite" [label="yes"];
-    "E2E passes with evidence?" -> "Implementer subagent fixes quality issues" [label="no"];
+    "Code quality reviewer subagent approves?" -> "Controller runs UEP verification" [label="yes"];
+    "Controller runs UEP verification" -> "UEP verification passes with evidence?";
+    "UEP verification passes with evidence?" -> "Mark task complete in TodoWrite" [label="yes"];
+    "UEP verification passes with evidence?" -> "Implementer subagent fixes quality issues" [label="no"];
     "Mark task complete in TodoWrite" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
@@ -201,6 +201,36 @@ Done!
 - Review loops add iterations
 - But catches issues early (cheaper than debugging later)
 
+## Verification File Management
+
+**At the completion of each phase**, the controller (you) must create or append to the verification file.
+
+**File location:** `docs/plans/YYYY-MM-DD-<feature-name>-test-verification.md`
+
+**If file doesn't exist (first phase)**, create it with header:
+
+```markdown
+# [Feature Name] Test Verification
+
+> UEP Type: [From plan header]
+> Verification Method: [From plan header]
+
+---
+```
+
+**At each phase completion**, append:
+
+```markdown
+## Phase N: [Phase Name]
+**Verification performed:** [Today's date]
+**What was tested:**
+- [Specific actions taken to verify via UEP]
+- [Evidence from UEP verification step]
+**Result:** PASS
+```
+
+**This is the controller's responsibility, not the subagent's.**
+
 ## Red Flags
 
 **Never:**
@@ -217,9 +247,9 @@ Done!
 - **Start code quality review before spec compliance is ✅** (wrong order)
 - Move to next task while either review has open issues
 - Trust implementer's verification claims without seeing output
-- Skip E2E verification for UI changes
-- Accept "I ran Playwright" without shown evidence
-- Move to next task without E2E verification (for UI work)
+- Skip UEP verification
+- Accept "I verified it" without shown evidence
+- Move to next task without UEP verification
 
 **If subagent asks questions:**
 - Answer clearly and completely

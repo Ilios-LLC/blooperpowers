@@ -53,38 +53,88 @@ After all tasks complete and verified:
 
 **Every task ends in one of two states:**
 
-**PASS:** Playwright verification succeeds → commit, move to next task
+**PASS:** UEP verification succeeds → commit, move to next task
 
-**ASK:** Playwright verification fails → stop and request help using required template
+**ASK:** UEP verification fails → stop and request help using required template
 
 **No other outcomes are valid:**
 - ❌ No "blocked" — either fix it or ASK
 - ❌ No "skipped" — every task must be verified
 - ❌ No "partial success" — it works or it doesn't
 - ❌ No "tests failed but continuing" — stop and ASK
-- ❌ No workarounds — no curl, no API tests, no unit-test-only verification
+- ❌ No workarounds — verify via the designated UEP, not shortcuts
 
-## Playwright-Only Verification (Web Apps)
+## Verification File Management
 
-**For web applications, all task verification must use Playwright browser testing.**
+**At the completion of each phase**, create or append to the verification file.
 
-**Allowed:**
+**File location:** `docs/plans/YYYY-MM-DD-<feature-name>-test-verification.md`
+(Same date prefix as the implementation plan)
+
+**If file doesn't exist (first phase)**, create it with header:
+
+```markdown
+# [Feature Name] Test Verification
+
+> UEP Type: [From plan header]
+> Verification Method: [From plan header]
+
+---
+```
+
+**At each phase completion**, append:
+
+```markdown
+## Phase N: [Phase Name]
+**Verification performed:** [Today's date]
+**What was tested:**
+- [Specific actions taken to verify via UEP]
+- [Commands run, pages visited, dashboards checked]
+- [Evidence observed]
+**Result:** PASS
+```
+
+**The "What was tested" section must be specific enough that someone could reproduce the verification.**
+
+**Do not:**
+- Write vague summaries ("tested the feature")
+- Skip the verification file when a phase completes
+- Overwrite previous phases (append only)
+
+## UEP-Appropriate Verification
+
+**All task verification must use the project's designated User Entrypoint.**
+
+**Web Application (Playwright):**
 - ✅ Playwright navigation and assertions
 - ✅ Playwright screenshots for evidence
-- ✅ Playwright console log capture
+- ❌ curl or direct API calls as final verification
 
-**Not allowed as final verification:**
-- ❌ curl or wget
-- ❌ Direct API calls
-- ❌ Unit tests alone (unit tests are in addition to, not instead of)
-- ❌ "I checked the code and it looks correct"
-- ❌ Postman or similar tools
+**CLI Tool:**
+- ✅ Command execution with output capture
+- ✅ Exit code verification
+- ❌ Unit tests alone without running actual commands
 
-**The test must match how users actually interact.** If users use a browser, verify with a browser.
+**API Service:**
+- ✅ curl/httpie requests with response capture
+- ✅ Test client assertions
+- ❌ "I checked the code" without actual requests
+
+**Cloud Dashboard:**
+- ✅ Console/dashboard state verification
+- ✅ API queries to check resource state (e.g., `terraform show`, `aws cli`)
+- ❌ "I applied it" without verifying result
+
+**Library/SDK:**
+- ✅ Test suite execution with output
+- ✅ Example consumer script execution
+- ❌ "Tests pass" without showing output
+
+**The test must match how users actually interact.** Verify via the UEP, not via shortcuts.
 
 ## Required ASK Template
 
-**When Playwright verification fails, use this exact format:**
+**When UEP verification fails, use this exact format:**
 
 ```markdown
 ## Task Failed: [Task Name]
@@ -92,13 +142,15 @@ After all tasks complete and verified:
 **What I was trying to verify:**
 [The user-facing outcome, e.g., "User can see empty recipe list"]
 
+**UEP Type:** [Web Application / CLI Tool / API Service / Cloud Dashboard / Library/SDK]
+
 **What happened:**
-[Specific failure, e.g., "Page shows 500 error instead of recipe list"]
+[Specific failure, e.g., "Command returned exit code 1 instead of 0"]
 
 **Evidence:**
-- Playwright output: [paste]
-- Screenshot: [if available]
-- Console errors: [if any]
+- Verification output: [paste actual output]
+- Screenshot/state: [if applicable]
+- Error messages: [if any]
 
 **What I tried:**
 1. [First attempt and result]
@@ -110,7 +162,7 @@ After all tasks complete and verified:
 
 **You must provide:**
 - Specific failure description (not "it didn't work")
-- Evidence from Playwright (output, screenshots, console)
+- Evidence from UEP verification (output, screenshots, state)
 - What you already tried
 - A specific, actionable ask
 
@@ -125,9 +177,10 @@ After all tasks complete and verified:
 ## Remember
 - Review plan critically first
 - Follow plan steps exactly
-- **Playwright verification is mandatory for web apps** — no exceptions
+- **UEP verification is mandatory** — verify via the designated User Entrypoint
 - **Binary outcomes only** — PASS or ASK, nothing else
 - **Use the ASK template** — specific, structured, with evidence
+- **Update verification file at phase completion** — append semantic summary
 - Reference skills when plan says to
 - Between batches: just report and wait
 - **Never skip, block, or work around failed verification**
