@@ -33,7 +33,7 @@ digraph when_to_use {
 - Same session (no context switch)
 - Fresh subagent per task (no context pollution)
 - Two-stage review after each task: spec compliance first, then code quality
-- Faster iteration (no human-in-loop between tasks)
+- Same checkpoint pauses at phase boundaries
 
 ## The Process
 
@@ -80,7 +80,10 @@ digraph process {
     "Controller runs UEP verification" -> "UEP verification passes with evidence?";
     "UEP verification passes with evidence?" -> "Mark task complete in TodoWrite" [label="yes"];
     "UEP verification passes with evidence?" -> "Implementer subagent fixes quality issues" [label="no"];
-    "Mark task complete in TodoWrite" -> "More tasks remain?";
+    "Mark task complete in TodoWrite" -> "Was task a [CHECKPOINT]?";
+    "Was task a [CHECKPOINT]?" -> "Report and wait for feedback" [label="yes"];
+    "Was task a [CHECKPOINT]?" -> "More tasks remain?" [label="no"];
+    "Report and wait for feedback" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
     "Dispatch final code reviewer subagent for entire implementation" -> "Use superpowers:finishing-a-development-branch";
@@ -92,6 +95,20 @@ digraph process {
 - `./implementer-prompt.md` - Dispatch implementer subagent
 - `./spec-reviewer-prompt.md` - Dispatch spec compliance reviewer subagent
 - `./code-quality-reviewer-prompt.md` - Dispatch code quality reviewer subagent
+
+## Checkpoint Pauses
+
+**After completing any task with `[CHECKPOINT]` in the title, pause for user feedback.**
+
+**Detection:** Check if task subject contains `[CHECKPOINT]` (case-sensitive string match)
+
+**When checkpoint reached:**
+1. Report tasks completed since last checkpoint
+2. Show verification file update (what was written to test-verification.md)
+3. Say: "Phase complete. Ready for feedback."
+4. Wait for user response before continuing
+
+**Fallback:** If plan has no `[CHECKPOINT]` markers (legacy plans), execute all tasks without intermediate pauses (original behavior).
 
 ## Example Workflow
 
@@ -125,6 +142,7 @@ Spec reviewer: ✅ Spec compliant - all requirements met, nothing extra
 Code reviewer: Strengths: Good test coverage, clean. Issues: None. Approved.
 
 [Mark Task 1 complete]
+[Task 1 was not a [CHECKPOINT], continue to next task]
 
 Task 2: Recovery modes
 
@@ -159,8 +177,14 @@ Implementer: Extracted PROGRESS_INTERVAL constant
 Code reviewer: ✅ Approved
 
 [Mark Task 2 complete]
+[Task 2 has [CHECKPOINT] in title - pause for feedback]
 
-...
+You: "Phase 1 complete. Tasks 1-2 finished. Verification file updated.
+Ready for feedback."
+
+User: "Looks good, continue."
+
+Task 3: ...
 
 [After all tasks]
 [Dispatch final code-reviewer]
@@ -179,8 +203,8 @@ Done!
 
 **vs. Executing Plans:**
 - Same session (no handoff)
-- Continuous progress (no waiting)
-- Review checkpoints automatic
+- Two-stage review (spec + quality) per task
+- Same checkpoint pauses at phase boundaries
 
 **Efficiency gains:**
 - No file reading overhead (controller provides full text)

@@ -21,20 +21,23 @@ Load plan, review critically, execute tasks in batches, report for review betwee
 3. If concerns: Raise them with your human partner before starting
 4. If no concerns: Create TodoWrite and proceed
 
-### Step 2: Execute Batch
-**Default: First 3 tasks**
+### Step 2: Execute Until Checkpoint
+**Execute tasks until completing a `[CHECKPOINT]` task, then pause.**
 
 For each task:
 1. Mark as in_progress
 2. Follow each step exactly (plan has bite-sized steps)
 3. Run verifications as specified
 4. Mark as completed
+5. If task has `[CHECKPOINT]` in title: stop and go to Step 3
 
-### Step 3: Report
-When batch complete:
-- Show what was implemented
-- Show verification output
-- Say: "Ready for feedback."
+**Fallback:** If plan has no `[CHECKPOINT]` markers (legacy plans), batch by 3 tasks.
+
+### Step 3: Report at Checkpoint
+When `[CHECKPOINT]` task complete (or batch of 3 for legacy plans):
+- Show tasks completed since last checkpoint
+- Show verification output and test-verification file update
+- Say: "Phase complete. Ready for feedback."
 
 ### Step 4: Continue
 Based on feedback:
@@ -177,6 +180,7 @@ After all tasks complete and verified:
 ## Remember
 - Review plan critically first
 - Follow plan steps exactly
+- **Pause at `[CHECKPOINT]` tasks** — these mark phase boundaries
 - **UEP verification is mandatory** — verify via the designated User Entrypoint
 - **Binary outcomes only** — PASS or ASK, nothing else
 - **Use the ASK template** — specific, structured, with evidence

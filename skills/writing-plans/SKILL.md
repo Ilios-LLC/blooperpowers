@@ -93,6 +93,10 @@ Phase 2: User can see resource deployed after apply
 ```markdown
 ### Task N: [User-Facing Outcome]
 
+For phase-ending tasks, use:
+
+### Task N: [CHECKPOINT] [User-Facing Outcome]
+
 **What the user can do after this task:** [e.g., "User can see an empty recipe list"]
 
 **Files:**
